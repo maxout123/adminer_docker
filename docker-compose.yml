@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.nginx
+    image: maxout/adminer:nginx
+    ports:
+      - 80:80
+    depends_on:
+      - php
+
+  php:
+    build: .
+    image: maxout/adminer:php

@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer-php
+spec:
+  selector:
+    matchLabels:
+      app: adminer
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: adminer
+        tier: backend
+    spec:
+      containers:
+        - name: php
+          image: maxout/adminer:php
+          ports:
+            - containerPort: 9000
+              name: fpm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adminer-nginx
+spec:
+  selector:
+    matchLabels:
+      app: adminer
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: adminer
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: maxout/adminer:nginx
+          ports:
+            - containerPort: 80
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php
+  labels:
+    app: adminer
+spec:
+  selector:
+    app: adminer
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: fpm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminer-web
+  labels:
+    app: adminer
+spec:
+  type: NodePort
+  selector:
+    app: adminer
+    tier: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
